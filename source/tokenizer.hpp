@@ -1,47 +1,21 @@
 #pragma once
 
+#include "tokens.hpp"
+
 #include <vector>
 #include <string>
 
 namespace regex {
-    enum class TokenType {
-        kEnd,
-        kDigit,
-        kWord,
-        kStartAnchor,
-        kEndAnchor,
-        kDot,
-        kLeftBrace,
-        kRightBrace,
-        kDivider,
-        kLeftBracket,
-        kRightBracket,
-        kPlus,
-        kQuestion,
-        kLiteral
-    };
-
-    class Token {
-    public:
-        Token(TokenType tokenType);
-        Token(TokenType tokenType, char payload);
-        bool operator==(const Token& other) const;
-        TokenType GetTokenType() const;
-    private:
-        TokenType tokenType_;
-        char payload_;
-    }
-
     class Tokenizer {
     public:
-        void Tokenizer(const std::string& pattern);
-
-        Token GetNextToken();
-        Token Peak(uint32_t n) const;
+        Tokenizer(const std::string& pattern);
         void Rewind(uint32_t n);
-        bool Match(Token token);
+        [[nodiscard]] Token GetNextToken();
+        [[nodiscard]] bool Match(TokenType token);
+        [[nodiscard]] TokenType Peak(uint32_t n = 0) const;
+        friend std::ostream& operator<<(std::ostream& os, const Tokenizer& token);
     private: 
-        std::vector<Token> tokens;
-        size_t currentIdx;
+        std::vector<Token> tokens_;
+        size_t currentIdx_;
     };
 }

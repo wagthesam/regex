@@ -1,7 +1,9 @@
 #include "tokenizer.hpp"
 #include "parser.hpp"
 
-int main(int argc, char* argv[]) {  
+#include <iostream>
+
+int main(int argc, char* argv[]) {
     std::string inputText;
     std::string pattern;
     for (int i = 1; i < argc; ++i) {
@@ -13,6 +15,8 @@ int main(int argc, char* argv[]) {
     }
 
     regex::Tokenizer tokenizer(pattern);
+
+    std::cout << "Tokens: " << tokenizer << std::endl;
 
     return 0;
 }

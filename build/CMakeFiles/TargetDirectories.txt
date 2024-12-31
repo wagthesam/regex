@@ -1,0 +1,10 @@
+/Users/sansonhu/regex/build/CMakeFiles/regex_lib.dir
+/Users/sansonhu/regex/build/CMakeFiles/regex_exe.dir
+/Users/sansonhu/regex/build/CMakeFiles/package.dir
+/Users/sansonhu/regex/build/CMakeFiles/package_source.dir
+/Users/sansonhu/regex/build/CMakeFiles/edit_cache.dir
+/Users/sansonhu/regex/build/CMakeFiles/rebuild_cache.dir
+/Users/sansonhu/regex/build/CMakeFiles/list_install_components.dir
+/Users/sansonhu/regex/build/CMakeFiles/install.dir
+/Users/sansonhu/regex/build/CMakeFiles/install/local.dir
+/Users/sansonhu/regex/build/CMakeFiles/install/strip.dir

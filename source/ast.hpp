@@ -1,30 +1,22 @@
 #pragma once
 
+#include "tokens.hpp"
+
 #include <vector>
+#include <string>
 
 namespace regex {
-    class AbstractSyntaxTree {
-    public:
-
-    private:
-        StartAnchor startAnchor_;
-        Expression expression_;
-        EndAnchor endAnchor_;
-    };
-
-    class StartAnchor {};
-    class EndAnchor {};
-    
-    class Expression {
-    public:
-        Expression(std::vector<SubExpression> subExpressions);
-    private:
-        std::vector<SubExpression> subExpressions_;
-    };
 
     class SubExpression {
     public:
         ~SubExpression() {}
+    };
+
+    class Expression {
+    public:
+        Expression(std::vector<std::unique_ptr<SubExpression>>&& subExpressions);
+    private:
+        std::vector<std::unique_ptr<SubExpression>> subExpressions_;
     };
 
     class Literal : public SubExpression {
@@ -40,39 +32,44 @@ namespace regex {
 
     class PositiveGroup : public SubExpression {
     public:
-        PositiveGroup(const std::string& literals);
+        PositiveGroup(std::vector<Literal>&& literals);
     private:
-        std::string<char> literals_;
+        std::vector<Literal> literals_;
     };
 
     class NegativeGroup : public SubExpression {
     public:
-        NegativeGroup(const std::string& literals);
+        NegativeGroup(std::vector<Literal>&& literals);
     private:
-        std::string<char> literals_;
+        std::vector<Literal> literals_;
     };
 
     class Alternation : public SubExpression {
-        Alternation(std::vector<SubExpression> left,
-        std::vector<SubExpression> right);
+    public:
+        Alternation(
+            std::vector<std::unique_ptr<SubExpression>>&& left,
+            std::vector<std::unique_ptr<SubExpression>>&& right);
     private:
-        std::vector<SubExpression> left_;
-        std::vector<SubExpression> right_;
+        std::vector<std::unique_ptr<SubExpression>> left_;
+        std::vector<std::unique_ptr<SubExpression>> right_;
     };
 
     class OnePlus : public SubExpression {
     public:
-        OnePlus(SubExpression expression);
+        OnePlus(std::unique_ptr<SubExpression> expression);
     private:
-        SubExpression expression_;
+        std::unique_ptr<SubExpression> expression_;
     };
 
     class ZeroPlus : public SubExpression {
     public:
-        ZeroPlus(SubExpression expression);
+        ZeroPlus(std::unique_ptr<SubExpression> expression);
     private:
-        SubExpression expression_;
+        std::unique_ptr<SubExpression> expression_;
     };
 
     class Wildcard : public SubExpression {};
+
+    class StartAnchor: public SubExpression {};
+    class EndAnchor : public SubExpression {};
 }

@@ -1,5 +1,4 @@
-#pragma once
-
+#include "tokens.hpp"
 #include "tokenizer.hpp"
 
 #include <vector>
@@ -7,76 +6,76 @@
 #include <stdexcept>
 
 namespace regex {
-    bool Token::operator==(const Token& other) const {
-        return tokenType_ == other.tokenType_ && payload_ == other.payload_;
-    }
-
-    TokenType Token::GetTokenType() const {
-        return tokenType_;
-    }
-
-    Token::Token(TokenType tokenType, char payload) : tokenType_(tokenType), payload_(payload) {}
-
-    Token::Token(TokenType tokenType) : tokenType_(tokenType), payload_('\0') {}
-
-    void Tokenizer::Tokenizer(const std::string& pattern) : currentIdx(0) {
-        for (size_t idx = 0; idx < pattern.length(), idx++) {
+    Tokenizer::Tokenizer(const std::string& pattern) : currentIdx_(0) {
+        for (size_t idx = 0; idx < pattern.length(); idx++) {
             if (pattern[idx] ==  '^') {
-                tokens.push_back(Token::kStartAnchor);
+                tokens_.push_back(Token(TokenType::kStartAnchor));
             } else if (pattern[idx] == '$') {
-                tokens.push_back(Token::kEndAnchor);
+                tokens_.push_back(Token(TokenType::kEndAnchor));
             } else if (pattern[idx] == '|') {
-                tokens.push_back(Token::kDivider);
+                tokens_.push_back(Token(TokenType::kDivider));
             } else if (pattern[idx] == '(') {
-                tokens.push_back(Token::kLeftBrace);
+                tokens_.push_back(Token(TokenType::kLeftBrace));
             } else if (pattern[idx] == ')') {
-                tokens.push_back(Token::kRightBrace);
+                tokens_.push_back(Token(TokenType::kRightBrace));
             } else if (pattern[idx] == '[') {
-                tokens.push_back(Token::kLeftBracket);
+                tokens_.push_back(Token(TokenType::kLeftBracket));
             } else if (pattern[idx] == ']') {
-                tokens.push_back(Token::kRightBracket);
+                tokens_.push_back(Token(TokenType::kRightBracket));
             } else if (pattern[idx] == '+') {
-                tokens.push_back(Token::kPlus);
+                tokens_.push_back(Token(TokenType::kPlus));
             } else if (pattern[idx] == '.') {
-                tokens.push_back(Token::kDot);
+                tokens_.push_back(Token(TokenType::kDot));
             } else if (pattern[idx] == '\\' && pattern[idx+1] == 'd') {
-                tokens.push_back(Token::kDigit);
+                tokens_.push_back(Token(TokenType::kDigit));
             } else if (pattern[idx] == '\\' && pattern[idx+1] == 'w') {
-                tokens.push_back(Token::kWord);
+                tokens_.push_back(Token(TokenType::kWord));
             } else {
-                tokens.push_back(Token::kLiteral, pattern[idx]);
+                tokens_.push_back(Token(TokenType::kLiteral, pattern[idx]));
             }
         }
-        tokens.push_back(Token::kEnd);
+        tokens_.push_back(Token(TokenType::kEnd));
     }
 
     Token Tokenizer::GetNextToken() {
-        auto token = tokens[currentIdx];
-        if (token.GetType() != TokenType.kEnd) currentIdx++;
+        auto token = tokens_[currentIdx_];
+        if (token.GetTokenType() != TokenType::kEnd) currentIdx_++;
         return token;
     }
 
-    Token Tokenizer::Peak(uint32_t n) const {
-        if (currentIdx >= tokens.length()) {
+    TokenType Tokenizer::Peak(uint32_t n) const {
+        if (currentIdx_ >= tokens_.size()) {
             throw std::runtime_error("Peak");
         }
-        return tokens[currentIdx];
+        return tokens_[currentIdx_].GetTokenType();
     }
 
-    Token Tokenizer::Rewind(uint32_t n) {
-        auto rewindIdx = static_cast<int32_t>(currentIdx) - static_cast<int32_t>(n);
+    void Tokenizer::Rewind(uint32_t n) {
+        auto rewindIdx = static_cast<int32_t>(currentIdx_) - static_cast<int32_t>(n);
         if (rewindIdx < 0) {
             throw std::runtime_error("Rewind");
         }
-        return tokens[rewindIdx];
+        currentIdx_ = rewindIdx;
     }
 
-    bool Tokenizer::Match(Token token) const {
-        if (token.GetType() == TokenType::kEnd) throw std::runtime_error("Match");
-        if (token == tokens[currentIdx]) {
-            currentIdx++;
+    bool Tokenizer::Match(TokenType tokenType) {
+        if (tokenType == TokenType::kEnd) throw std::runtime_error("Match");
+        if (tokenType == tokens_[currentIdx_].GetTokenType()) {
+            currentIdx_++;
             return true;
         }
         return false;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Tokenizer& tokenizer) {
+        bool first = false;
+        for (const auto& token : tokenizer.tokens_) {
+            if (!first) {
+                os << " ";
+                first = true;
+            }
+            os << token;
+        }
+        return os;
     }
 }
