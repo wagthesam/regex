@@ -13,12 +13,15 @@ namespace regex {
         if (tokenizer_->Match(TokenType::kStartAnchor)) {
             subExpressions.push_back(std::make_unique<StartAnchor>());
         }
-        while (tokenizer_->Peak() != TokenType::kEndAnchor
-                && tokenizer_->Peak() != TokenType::kEnd) {
+        while (tokenizer_->Peak() != TokenType::kEnd) {
+            if (tokenizer_->Match(TokenType::kEndAnchor)) {
+                if (tokenizer_->Peak() != TokenType::kEnd) {
+                    throw std::runtime_error("Parse end anchor not followed by EOF");
+                }
+                subExpressions.push_back(std::make_unique<EndAnchor>());
+                break;
+            }
             subExpressions.push_back(std::move(ParseSubExpression()));
-        }
-        if (tokenizer_->Match(TokenType::kEndAnchor)) {
-            subExpressions.push_back(std::make_unique<EndAnchor>());
         }
         Expression expression(std::move(subExpressions));
         return expression;
@@ -44,7 +47,7 @@ namespace regex {
                     break;
                 }
                 if (tokenizer_->Peak() != TokenType::kLiteral) {
-                    throw std::runtime_error("ParseSubExpression group non literal");  
+                    throw std::runtime_error("ParseSubExpression group non literal");
                 }
                 literals.push_back(Literal(tokenizer_->GetNextToken().GetPayload()));
             }
