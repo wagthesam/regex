@@ -50,14 +50,6 @@ namespace regex {
         return tokens_[currentIdx_].GetTokenType();
     }
 
-    void Tokenizer::Rewind(uint32_t n) {
-        auto rewindIdx = static_cast<int32_t>(currentIdx_) - static_cast<int32_t>(n);
-        if (rewindIdx < 0) {
-            throw std::runtime_error("Rewind");
-        }
-        currentIdx_ = rewindIdx;
-    }
-
     bool Tokenizer::Match(TokenType tokenType) {
         if (tokenType == TokenType::kEnd) throw std::runtime_error("Match");
         if (tokenType == tokens_[currentIdx_].GetTokenType()) {
